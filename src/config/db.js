@@ -1,5 +1,5 @@
 module.exports = {
-    url: "mongodb+srv://divyarajc619:Your Password@cluster0.qgpsdna.mongodb.net/",
+    url: "mongodb+srv://divyarajc619:divyaraj30d@cluster0.qgpsdna.mongodb.net/",
     database: "api",
     imgBucket: "image",
   };
