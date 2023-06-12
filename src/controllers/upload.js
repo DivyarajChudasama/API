@@ -55,7 +55,6 @@ const getListFiles = async (req, res) => {
     let fileInfos = [];
     await cursor.forEach((doc) => {
       fileInfos.push({
-        name: doc.filename,
         url: baseUrl + doc.filename,
       });
     });
