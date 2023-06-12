@@ -40,12 +40,11 @@ const getListFiles = async (req, res) => {
     const database = mongoClient.db(dbConfig.database);
     const images = database.collection(dbConfig.imgBucket + ".files");
 
-    const page = parseInt(req.query.page) || 1; // Get the page number from the query parameters
-    const limit = 2; // Number of files per page
+    const page = parseInt(req.query.page) || 1; // Get the page number from the request query parameters
+    const limit = 2; // Set the number of files to display per page to 2
+    const skip = (page - 1) * limit; // Calculate the number of files to skip based on the current page and limit
 
-    const cursor = images.find({})
-      .skip((page - 1) * limit) // Skip files based on the page number and limit
-      .limit(limit); // Limit the number of files per page
+    const cursor = images.find({}).skip(skip).limit(limit);
 
     if ((await cursor.count()) === 0) {
       return res.status(500).send({
@@ -62,22 +61,14 @@ const getListFiles = async (req, res) => {
     });
 
     const totalFiles = await images.countDocuments(); // Get the total number of files
+
     const totalPages = Math.ceil(totalFiles / limit); // Calculate the total number of pages
 
-    let fileHtml = fileInfos
-      .map((file) => `<a href="${file.url}">${file.name}</a><br>`)
-      .join("");
-
-    const htmlResponse = `
-      <div>
-        ${fileHtml}
-      </div>
-      <div>
-        Page ${page} of ${totalPages}
-      </div>
-    `;
-
-    return res.status(200).send(htmlResponse);
+    return res.status(200).send({
+      files: fileInfos,
+      currentPage: page,
+      totalPages: totalPages,
+    });
   } catch (error) {
     return res.status(500).send({
       message: error.message,
@@ -97,7 +88,7 @@ const download = async (req, res) => {
     let downloadStream = bucket.openDownloadStreamByName(req.params.name);
 
     downloadStream.on("data", function (data) {
-      return res.status(200).write(data);
+      return res.status(200).write(JSON.stringify(JSON.parse(data), null, 4));
     });
 
     downloadStream.on("error", function (err) {
