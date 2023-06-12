@@ -41,7 +41,7 @@ const getListFiles = async (req, res) => {
     const images = database.collection(dbConfig.imgBucket + ".files");
 
     const page = parseInt(req.query.page) || 1; // Get the page number from the request query parameters
-    const limit = 2; // Set the number of files to display per page to 2
+    const limit = 10; // Set the number of files to display per page to 2
     const skip = (page - 1) * limit; // Calculate the number of files to skip based on the current page and limit
 
     const cursor = images.find({}).skip(skip).limit(limit);
