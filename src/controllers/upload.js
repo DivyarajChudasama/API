@@ -6,7 +6,7 @@ const GridFSBucket = require("mongodb").GridFSBucket;
 
 const url = dbConfig.url;
 
-const baseUrl = "https://image-api-90tl.onrender.com/files/";
+const baseUrl = "http://localhost:8080/files/";
 
 const mongoClient = new MongoClient(url);
 
@@ -40,7 +40,11 @@ const getListFiles = async (req, res) => {
     const database = mongoClient.db(dbConfig.database);
     const images = database.collection(dbConfig.imgBucket + ".files");
 
-    const cursor = images.find({});
+    const page = parseInt(req.query.page) || 1; // Get the page number from the request query parameters
+    const limit = 2; // Set the number of files to display per page to 2
+    const skip = (page - 1) * limit; // Calculate the number of files to skip based on the current page and limit
+
+    const cursor = images.find({}).skip(skip).limit(limit);
 
     if ((await cursor.count()) === 0) {
       return res.status(500).send({
@@ -56,7 +60,15 @@ const getListFiles = async (req, res) => {
       });
     });
 
-    return res.status(200).send(fileInfos);
+    const totalFiles = await images.countDocuments(); // Get the total number of files
+
+    const totalPages = Math.ceil(totalFiles / limit); // Calculate the total number of pages
+
+    return res.status(200).send({
+      files: fileInfos,
+      currentPage: page,
+      totalPages: totalPages,
+    });
   } catch (error) {
     return res.status(500).send({
       message: error.message,
