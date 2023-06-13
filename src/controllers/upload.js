@@ -112,4 +112,8 @@ const download = async (req, res) => {
   }
 };
 
-module
+module.exports = {
+  uploadFiles,
+  getListFiles,
+  download,
+};
