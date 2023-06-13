@@ -22,11 +22,20 @@ const uploadFiles = async (req, res) => {
     }
 
     const allowedFormats = ["jpg", "jpeg", "png"]; // Allowed file formats
+    const allowedSize = 5 * 1024 * 1024; // 5 MB (in bytes)
+    
     const fileFormat = req.file.originalname.split(".").pop().toLowerCase(); // Get the file format of the uploaded file
+    const fileSize = req.file.size; // Get the file size of the uploaded file
 
     if (!allowedFormats.includes(fileFormat)) {
       return res.status(400).send({
         message: "Invalid file format. Allowed formats: jpg, jpeg, png.",
+      });
+    }
+
+    if (fileSize > allowedSize) {
+      return res.status(400).send({
+        message: "File size exceeds the limit of 5 MB.",
       });
     }
 
@@ -99,7 +108,7 @@ const download = async (req, res) => {
     });
 
     downloadStream.on("error", function (err) {
-      return res.status(404).send({ message: "Cannot download the Image!" });
+      return res.status(404).send({ message: "Cannot download the image!" });
     });
 
     downloadStream.on("end", () => {
