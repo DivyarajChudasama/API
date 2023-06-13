@@ -16,8 +16,17 @@ const uploadFiles = async (req, res) => {
     console.log(req.file);
 
     if (req.file == undefined) {
-      return res.send({
+      return res.status(400).send({
         message: "You must select a file.",
+      });
+    }
+
+    const allowedFormats = ["jpg", "jpeg", "png"]; // Allowed file formats
+    const fileFormat = req.file.originalname.split(".").pop().toLowerCase(); // Get the file format of the uploaded file
+
+    if (!allowedFormats.includes(fileFormat)) {
+      return res.status(400).send({
+        message: "Invalid file format. Allowed formats: jpg, jpeg, png.",
       });
     }
 
@@ -28,7 +37,7 @@ const uploadFiles = async (req, res) => {
     console.log(error);
 
     return res.status(400).send({
-      message: `Error when trying upload image: ${error}`,
+      message: `Error when trying to upload image: ${error}`,
     });
   }
 };
@@ -41,7 +50,7 @@ const getListFiles = async (req, res) => {
     const images = database.collection(dbConfig.imgBucket + ".files");
 
     const page = parseInt(req.query.page) || 1; // Get the page number from the request query parameters
-    const limit = 5; // Set the number of files to display per page to 2
+    const limit = 5; // Set the number of files to display per page
     const skip = (page - 1) * limit; // Calculate the number of files to skip based on the current page and limit
 
     const cursor = images.find({}).skip(skip).limit(limit);
@@ -60,7 +69,6 @@ const getListFiles = async (req, res) => {
     });
 
     const totalFiles = await images.countDocuments(); // Get the total number of files
-
     const totalPages = Math.ceil(totalFiles / limit); // Calculate the total number of pages
 
     return res.status(200).send({
@@ -104,8 +112,4 @@ const download = async (req, res) => {
   }
 };
 
-module.exports = {
-  uploadFiles,
-  getListFiles,
-  download,
-};
+module
