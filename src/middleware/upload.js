@@ -11,7 +11,7 @@ var storage = new GridFsStorage({
                    "application/x-dc","model/ifc","image/vnd.dwg","image/bmp","application/vnd.ms-excel","text/plain","audio/aac","application/vnd.ms-powerpoint","application/vnd.openxmlformats-officedocument.presentationml.presentation"
                     ,"text/csv","application/msword","application/vnd.openxmlformats-officedocument.wordprocessingml.document","application/java-archive","application/json","audio/mpeg",
                      "video/mpeg","audio/mpeg","application/vnd.ms-excel","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet","application/xml",
-                      "application/octet-stream"];
+                      "application/octet-stream","application/vnd.rar"];
 
     if (match.indexOf(file.mimetype) === -1) {
       const filename = `${file.originalname}`;
